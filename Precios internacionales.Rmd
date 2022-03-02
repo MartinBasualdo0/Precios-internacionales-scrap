@@ -42,12 +42,26 @@ library(glue)
 ```
 ```{r abrir_navegador, echo = T, results = 'hide'}
 link = "https://news.agrofy.com.ar/granos/series-historicas-pizarra"
+
+eCaps <- list(
+  chromeOptions = 
+    list(prefs = list("profile.default_content_settings.popups" = 0L,
+"download.prompt_for_download" = FALSE,
+"directory_upgrade" = TRUE,
+"download.default_directory" = getwd())
+  )
+)
+
+
 driver <- remoteDriver(remoteServerAddr = "localhost", 
-                      browserName = "chrome") # Inicia o driver
+                      browserName = "chrome",
+                      extraCapabilities = eCaps) # Inicia o driver
 driver$open() # Abre navegador/browser
 driver$navigate(link) # Navega pelo link
 driver$maxWindowSize() # Maximiza a janela do navegador
 ```
+
+
 Se cierra solo en 6 segundos aprox. 
 
 
@@ -126,7 +140,15 @@ buscar <- driver$findElements(using = 'css',
                                    value = '.btn-primary')
 buscar[[length(buscar)]]$clickElement()
 
-sys.sleep(60) #55 en realiad, pero prefiero darle paso
+Sys.sleep(60) #55 en realiad, pero prefiero darle paso
+```
+
+
+```{r}
+export_csv_button <- driver$findElement(using = 'css',
+                                   value = '.csv-export')
+export_csv_button$clickElement()
+
 ```
 
 
