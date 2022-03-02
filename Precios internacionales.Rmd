@@ -38,17 +38,63 @@ library(RSelenium)
 library(tidyverse)
 library(lubridate)
 library(rvest)
+library(glue)
 ```
 ```{r abrir_navegador, echo = T, results = 'hide'}
 link = "https://news.agrofy.com.ar/granos/series-historicas-pizarra"
-remDr <- remoteDriver(remoteServerAddr = "localhost", 
+driver <- remoteDriver(remoteServerAddr = "localhost", 
                       browserName = "chrome") # Inicia o driver
-remDr$open() # Abre navegador/browser
-remDr$navigate(link) # Navega pelo link
-remDr$maxWindowSize() # Maximiza a janela do navegador
+driver$open() # Abre navegador/browser
+driver$navigate(link) # Navega pelo link
+driver$maxWindowSize() # Maximiza a janela do navegador
 ```
 Se cierra solo en 6 segundos aprox. 
+
+
+Abrimos el calendario para elegir el inicio del periodo a consultar
 ```{r}
+Sys.sleep(10)
+
+date_pickers <- driver$findElements(using = 'css',
+                                   value = '.react-datepicker__input-container')
+since_date_picker <- date_pickers[[1]]
+to_date_picker<- date_pickers[[2]] 
+
+
+since_date_picker$clickElement() #abre datepicker que selecciona inicio de consulta
+```
+Ahora tenemos que crear una funcion que, dada una fecha, la elija en el datepicker
+
+```{r}
+auto_datepicker <- function(desde){
+    #primero debemos saber la fecha de hoy y asi saber como nos tenemos que mover ene eldatepicker
+  desde <- as.Date(desde)
+  hoy <- today()
+
+  dif_de_meses <- length(seq(from=desde, to=hoy, by='month')) - 1
+  
+  
+  
+  for (n in 1:dif_de_meses){
+    #selecciona la flecha de mes
+    boton_mes_anterior <- driver$findElement(using = 'css',
+                                  value='.react-datepicker__navigation--previous')
+    boton_mes_anterior$clickElement()
+  }
+  dia_uno <- driver$findElement(using = 'css',
+                                  value='.react-datepicker__day--001')
+  dia_uno$clickElement()
+  
+}
+
+
 
 ```
+
+
+
+```{r}
+auto_datepicker('2021-05-03')
+```
+
 
