@@ -181,8 +181,59 @@ pre code {
 <li><p>Moneda: Dolar.</p></li>
 <li><p>Click en buscar</p></li>
 <li><p>Descargar la tabla completa. Ver si se puede hacer de una, y no necesariamente viendo las 75 páginas por selenium.</p></li>
+<li><p>Hacer lo mismo con el maíz, soja, girasol, y sorgo.</p></li>
 </ul>
 <p>Una vez extraídos los datos, tengo que hacer una media mensual.</p>
+<div id="scrap" class="section level1">
+<h1>Scrap</h1>
+<pre class="r"><code>setwd(&quot;./instalacion selenium r&quot;) # Inserir caminho
+system(&quot;java -jar selenium-server-standalone-4.0.0-alpha-1.jar&quot;, wait = FALSE) # Declara selenium
+system(&quot;chromedriver.exe&quot;, wait = FALSE) # Declara chromedriver</code></pre>
+<pre class="r"><code>library(RSelenium)
+library(tidyverse)
+library(lubridate)
+library(rvest)
+library(glue)</code></pre>
+<pre class="r"><code>link = &quot;https://news.agrofy.com.ar/granos/series-historicas-pizarra&quot;
+driver &lt;- remoteDriver(remoteServerAddr = &quot;localhost&quot;, 
+                      browserName = &quot;chrome&quot;) # Inicia o driver
+driver$open() # Abre navegador/browser
+driver$navigate(link) # Navega pelo link
+driver$maxWindowSize() # Maximiza a janela do navegador</code></pre>
+<p>Se cierra solo en 6 segundos aprox.</p>
+<p>Abrimos el calendario para elegir el inicio del periodo a consultar</p>
+<pre class="r"><code>Sys.sleep(10)
+
+date_pickers &lt;- driver$findElements(using = &#39;css&#39;,
+                                   value = &#39;.react-datepicker__input-container&#39;)
+since_date_picker &lt;- date_pickers[[1]]
+to_date_picker&lt;- date_pickers[[2]] 
+
+
+since_date_picker$clickElement() #abre datepicker que selecciona inicio de consulta</code></pre>
+<p>Ahora tenemos que crear una funcion que, dada una fecha, la elija en el datepicker</p>
+<pre class="r"><code>auto_datepicker &lt;- function(desde){
+    #primero debemos saber la fecha de hoy y asi saber como nos tenemos que mover ene eldatepicker
+  desde &lt;- as.Date(desde)
+  hoy &lt;- today()
+
+  dif_de_meses &lt;- length(seq(from=desde, to=hoy, by=&#39;month&#39;)) - 1
+  
+  
+  
+  for (n in 1:dif_de_meses){
+    #selecciona la flecha de mes
+    boton_mes_anterior &lt;- driver$findElement(using = &#39;css&#39;,
+                                  value=&#39;.react-datepicker__navigation--previous&#39;)
+    boton_mes_anterior$clickElement()
+  }
+  dia_uno &lt;- driver$findElement(using = &#39;css&#39;,
+                                  value=&#39;.react-datepicker__day--001&#39;)
+  dia_uno$clickElement()
+  
+}</code></pre>
+<pre class="r"><code>auto_datepicker(&#39;2021-05-03&#39;)</code></pre>
+</div>
 
 
 

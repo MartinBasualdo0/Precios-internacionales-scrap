@@ -4,7 +4,7 @@ author: "INDEC"
 date: "2/3/2022"
 output: html_document
 ---
-#Trigo
+## Trigo
 
 Entrar a [Agrofy](https://news.agrofy.com.ar/granos/series-historicas-pizarra), donde se encuentran los precios de trigo a valor fob en los principales puertos. El más representativo es el de la bolsa de rosario. 
 
@@ -67,13 +67,12 @@ Ahora tenemos que crear una funcion que, dada una fecha, la elija en el datepick
 
 ```{r}
 auto_datepicker <- function(desde){
-    #primero debemos saber la fecha de hoy y asi saber como nos tenemos que mover ene eldatepicker
+  # Elige la fecha automáticamente a partir de lo que pasamos como parámtero
+  #primero debemos saber la fecha de hoy y asi saber como nos tenemos que mover ene eldatepicker
   desde <- as.Date(desde)
   hoy <- today()
 
   dif_de_meses <- length(seq(from=desde, to=hoy, by='month')) - 1
-  
-  
   
   for (n in 1:dif_de_meses){
     #selecciona la flecha de mes
@@ -86,15 +85,48 @@ auto_datepicker <- function(desde){
   dia_uno$clickElement()
   
 }
-
-
-
 ```
 
 
 
 ```{r}
-auto_datepicker('2021-05-03')
+auto_datepicker('2010-01-01')
+```
+### Producto, mercado, moneda
+```{r}
+producto_mercado_dropdown <- driver$findElements(using = 'css',
+                                   value = '.dropdown-heading-value')
+producto_dropdown <- producto_mercado_dropdown[[1]]
+mercado_dropdown<- producto_mercado_dropdown[[2]] 
+
+producto_dropdown$clickElement()
+
+
+producto_todos <- driver$findElement(using = 'css', #Un solo elemento
+                                   value = '.select-item')
+producto_todos$clickElement()
+
+mercado_dropdown$clickElement()
+mercado_todos <- driver$findElement(using = 'css', #Un solo elemento
+                                   value = '.select-item')
+mercado_todos$clickElement()
+
+moneda_dropdown <- driver$findElement(using = 'css',
+                                   value = '#currency')
+moneda_dropdown$clickElement()
+
+moneda_option <- driver$findElements(using = 'css',
+                                   value = '.option')
+moneda_option[[2]]$clickElement()
+```
+Buscamos la wea
+
+```{r}
+buscar <- driver$findElements(using = 'css',
+                                   value = '.btn-primary')
+buscar[[length(buscar)]]$clickElement()
+
+sys.sleep(60) #55 en realiad, pero prefiero darle paso
 ```
 
 
