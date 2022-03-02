@@ -1,0 +1,29 @@
+---
+title: "Precios internacionales"
+author: "INDEC"
+date: "2/3/2022"
+output: html_document
+---
+#Trigo
+
+Entrar a [Agrofy](https://news.agrofy.com.ar/granos/series-historicas-pizarra), donde se encuentran los precios de trigo a valor fob en los principales puertos. El más representativo es el de la bolsa de rosario. 
+
+Pasos:
+
+* Fecha: ir a mano hasta el 2010. La flecha izquierda tiene que tocarse tantas veces como meses existan de diferencia entre el período base (1/1/2010) hasta la fecha. 
+
+* Materia prima: seleccionar trigo. 
+
+* Bolsa: Rosario.
+
+* Moneda: Dolar. 
+
+* Click en buscar
+
+* Descargar la tabla completa. Ver si se puede hacer de una, y no necesariamente viendo las 75 páginas por selenium. 
+
+Una vez extraídos los datos, tengo que hacer una media mensual. 
+```{r}
+
+```
+
