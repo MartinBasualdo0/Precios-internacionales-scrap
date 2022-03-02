@@ -138,10 +138,12 @@ moneda_option[[2]]$clickElement()
 Buscamos la wea
 
 ```{r}
+down <- driver$findElement("css", "body")
+down$sendKeysToElement(list(key = "down_arrow"))
+down$sendKeysToElement(list(key = "down_arrow"))
 buscar <- driver$findElements(using = 'css',
                                    value = '.btn-primary')
 buscar[[length(buscar)]]$clickElement()
-
 Sys.sleep(60) #55 en realiad, pero prefiero darle paso
 ```
 
@@ -156,10 +158,10 @@ export_csv_button$clickElement()
 
 ```{r}
 #boton_siguiente <- driver$findElement(using = 'css', value = '.board-table-pag-content__table')
-boton_siguiente <- driver$findElement(using = 'css', value = '.next')
-for (i in 1:1000){
-  
-  boton_siguiente$clickElement()
-}
+# boton_siguiente <- driver$findElement(using = 'css', value = '.next')
+# for (i in 1:1000){
+#   
+#   boton_siguiente$clickElement()
+# }
 ```
 
