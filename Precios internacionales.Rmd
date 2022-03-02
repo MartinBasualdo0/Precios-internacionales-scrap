@@ -20,9 +20,34 @@ Pasos:
 
 * Click en buscar
 
-* Descargar la tabla completa. Ver si se puede hacer de una, y no necesariamente viendo las 75 páginas por selenium. 
+* Descargar la tabla completa. Ver si se puede hacer de una, y no necesariamente viendo las 75 páginas por selenium.
+
+* Hacer lo mismo con el maíz, soja, girasol, y sorgo. 
 
 Una vez extraídos los datos, tengo que hacer una media mensual. 
+
+# Scrap
+
+```{r configura, echo=T, message=FALSE, warning=FALSE, results='hide'}
+setwd("./instalacion selenium r") # Inserir caminho
+system("java -jar selenium-server-standalone-4.0.0-alpha-1.jar", wait = FALSE) # Declara selenium
+system("chromedriver.exe", wait = FALSE) # Declara chromedriver
+```
+```{r librerías, echo=T, message=FALSE, warning=FALSE, results='hide'}
+library(RSelenium)
+library(tidyverse)
+library(lubridate)
+library(rvest)
+```
+```{r abrir_navegador, echo = T, results = 'hide'}
+link = "https://news.agrofy.com.ar/granos/series-historicas-pizarra"
+remDr <- remoteDriver(remoteServerAddr = "localhost", 
+                      browserName = "chrome") # Inicia o driver
+remDr$open() # Abre navegador/browser
+remDr$navigate(link) # Navega pelo link
+remDr$maxWindowSize() # Maximiza a janela do navegador
+```
+Se cierra solo en 6 segundos aprox. 
 ```{r}
 
 ```
