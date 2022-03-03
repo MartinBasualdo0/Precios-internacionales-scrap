@@ -39,6 +39,7 @@ library(tidyverse)
 library(lubridate)
 library(rvest)
 library(glue)
+library(dplyr) #Para calcular la variación mensual
 ```
 ```{r abrir_navegador, echo = T, results = 'hide'}
 link = "https://news.agrofy.com.ar/granos/series-historicas-pizarra"
@@ -155,13 +156,17 @@ export_csv_button$clickElement()
 
 ```
 
+### Wrangling
 
 ```{r}
-#boton_siguiente <- driver$findElement(using = 'css', value = '.board-table-pag-content__table')
-# boton_siguiente <- driver$findElement(using = 'css', value = '.next')
-# for (i in 1:1000){
-#   
-#   boton_siguiente$clickElement()
-# }
+serie <- read.csv("./series-historicas-pizarra.csv", sep = ";")
+view(serie)
+```
+```{r}
+serie %>%
+  group_by(Mercado) %>%
+  mutate(
+    var_mensual = (Precio - lag(Precio)) / lag(Precio)
+  )
 ```
 
