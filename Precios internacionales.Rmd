@@ -247,12 +247,15 @@ serie_mensual <- serie_mask %>%
    año = year(Fecha)
   ) %>%
   group_by(Mercado, Producto, año, mes) %>%
-  summarise(media_mensual = mean(Precio))
+  summarise(Precio_mensual = mean(Precio))
 ```
 ### Variación interanual de la media mensual
 
 ```{r}
-group_by()
+serie_mensual <- serie_mensual %>%
+  group_by(Mercado, Producto) %>%
+  mutate(
+    var_ia = (Precio_mensual - lag(Precio_mensual, 12)) / lag(Precio_mensual, 12))
 
 ```
 
