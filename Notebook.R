@@ -57,4 +57,5 @@ view(serie_mensual %>%
     var_ia = (Precio_mensual - lag(Precio_mensual, 12)) / lag(Precio_mensual, 12)
   ))
 
-
+view(serie_mensual %>%
+       arrange(año, mes))

@@ -259,7 +259,14 @@ serie_mensual <- serie_mensual %>%
 
 ```
 
+Por cuestiones de números de datos, se recomienda descartar el "Trigo art. 12", y todos los mercados, excepto el de rosario.  
 
+## Exportar Json
+
+```{r}
+write_json(serie_mensual, "./agrofy10años.json")
+unlink("series-historicas-pizarra.csv")
+```
 
 
 
