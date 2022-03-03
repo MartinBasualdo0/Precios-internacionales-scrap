@@ -164,14 +164,20 @@ serie <- read.csv("./series-historicas-pizarra.csv", sep = ";")
 view(serie)
 ```
 ```{r}
+
+#Limpiamos los datos
 serie$Precio <- serie$Precio %>%
 str_sub(5L) %>%
 as.numeric()
+
+serie$ï..Fecha <- serie$ï..Fecha %>%
+  as.Date(format = "%d-%m-%y")
 
 ```
 
 
 ```{r}
+#Creamos una variable para ver los 
 serie <- serie %>%
   group_by(Mercado, Producto)%>%
   mutate(
@@ -207,9 +213,10 @@ outliers_limits(serie)
 
 ```{r}
 outliers <- serie %>%
-  filter(Precio < outliers_limits(serie)[[2]])
-  
-
+  filter(Precio < outliers_limits(serie)[[2]])%>%
+  summarise(
+    count = n()
+  )
 
 outliers
 ```
