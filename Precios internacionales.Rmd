@@ -40,6 +40,7 @@ library(lubridate)
 library(rvest)
 library(glue)
 library(dplyr) #Para calcular la variación mensual
+library(jsonlite)
 ```
 ```{r abrir_navegador, echo = T, results = 'hide'}
 link = "https://news.agrofy.com.ar/granos/series-historicas-pizarra"
@@ -153,7 +154,7 @@ Sys.sleep(60) #55 en realiad, pero prefiero darle paso
 export_csv_button <- driver$findElement(using = 'css',
                                    value = '.csv-export')
 export_csv_button$clickElement()
-
+Sys.sleep(5) 
 ```
 
 ### Wrangling
@@ -163,10 +164,61 @@ serie <- read.csv("./series-historicas-pizarra.csv", sep = ";")
 view(serie)
 ```
 ```{r}
-serie %>%
-  group_by(Mercado) %>%
+serie$Precio <- serie$Precio %>%
+str_sub(5L) %>%
+as.numeric()
+
+```
+
+
+```{r}
+serie <- serie %>%
+  group_by(Mercado, Producto)%>%
   mutate(
-    var_mensual = (Precio - lag(Precio)) / lag(Precio)
+    Variacion_diaria = (Precio - lag(Precio)) / lag(Precio)
   )
+```
+
+```{r}
+view(serie)
+```
+```{r}
+outliers_limits <- function(df){
+  vector_de_precios <-df$Precio
+  Q <- quantile(vector_de_precios, probs= c(.25, .75), na.rm = FALSE)
+  iqr <- IQR(vector_de_precios)
+  
+  up <-  Q[2]+1.5*iqr # Upper Range  
+  low<- Q[1]-iqr # Lower Range
+  return(c(up,low))
+}
+
+```
+```{r}
+outliers_limits(serie %>%
+                  filter(Producto =="Soja" && Mercado == "B.Blanca"))
+```
+
+```{r}
+outliers_limits(serie)
+```
+
+
+
+```{r}
+outliers <- serie %>%
+  filter(Precio < outliers_limits(serie)[[2]])
+  
+
+
+outliers
+```
+
+
+```{r}
+serie %>%
+filter(Producto == "Trigo") %>%
+ggplot(mapping = aes(x = Mercado, y = Precio)) +
+geom_boxplot()
 ```
 
