@@ -26,6 +26,27 @@ serie %>%
 
 serie
 
+# formato fecha -----------------------------------------------------------
+
 serie$ï..Fecha %>%
   as.Date(format = "%d-%m-%y")
+
+# eliminar outliers -------------------------------------------------------
+
+serie_mask <- serie %>%
+  filter(between(Precio, 45, 1000))
+serie_mask
+
+# media mensual -----------------------------------------------------------
+
+serie_mask %>%
+  mutate(
+   mes = month(Fecha),
+   año = year(Fecha)
+  ) %>%
+  group_by(Mercado, Producto, año, mes) %>%
+  summarise(media_mensual = mean(Precio))
+
+
+
 

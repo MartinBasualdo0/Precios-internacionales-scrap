@@ -173,6 +173,8 @@ as.numeric()
 serie$ï..Fecha <- serie$ï..Fecha %>%
   as.Date(format = "%d-%m-%y")
 
+serie <- rename(serie, Fecha = ï..Fecha)
+
 ```
 
 
@@ -188,6 +190,7 @@ serie <- serie %>%
 ```{r}
 view(serie)
 ```
+### Outliers
 ```{r}
 outliers_limits <- function(df){
   vector_de_precios <-df$Precio
@@ -202,30 +205,60 @@ outliers_limits <- function(df){
 ```
 ```{r}
 outliers_limits(serie %>%
-                  filter(Producto =="Soja" && Mercado == "B.Blanca"))
+                  filter(Fecha > "01-01-2020"))
 ```
 
 ```{r}
 outliers_limits(serie)
 ```
 
+```{r}
+# outliers <- serie %>%
+#   filter(Precio < outliers_limits(serie)[[2]])%>%
+#   summarise(
+#     count = n()
+#   )
+# 
+# outliers
+```
 
 
+```{r}
+ggplot(data = serie) + 
+  geom_boxplot(mapping = aes(x = Mercado, y = Precio)) + 
+  facet_wrap(~ Producto, nrow = 2)
+```
 ```{r}
 outliers <- serie %>%
-  filter(Precio < outliers_limits(serie)[[2]])%>%
-  summarise(
-    count = n()
-  )
-
+  filter(Precio > 1000 | Precio < 45)
 outliers
 ```
+```{r}
+serie_mask <- serie %>%
+  filter(between(Precio, 45, 1000))
+```
 
+### Media mensual
 
 ```{r}
-serie %>%
-filter(Producto == "Trigo") %>%
-ggplot(mapping = aes(x = Mercado, y = Precio)) +
-geom_boxplot()
+serie_mensual <- serie_mask %>%
+  mutate(
+   mes = month(Fecha),
+   año = year(Fecha)
+  ) %>%
+  group_by(Mercado, Producto, año, mes) %>%
+  summarise(media_mensual = mean(Precio))
 ```
+### Variación interanual de la media mensual
+
+```{r}
+group_by()
+
+```
+
+
+
+
+
+
 
