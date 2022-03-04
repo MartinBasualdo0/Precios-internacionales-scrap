@@ -4,29 +4,27 @@ author: "INDEC"
 date: "2/3/2022"
 output: html_document
 ---
-## Trigo
+## Idea
 
-Entrar a [Agrofy](https://news.agrofy.com.ar/granos/series-historicas-pizarra), donde se encuentran los precios de trigo a valor fob en los principales puertos. El más representativo es el de la bolsa de rosario. 
+Entrar a [Agrofy](https://news.agrofy.com.ar/granos/series-historicas-pizarra), donde se encuentran los precios pizarra (diferente al oficial, CBOT y MtR) de los principales granos a valor FOB en los principales puertos. El más representativo es el de la bolsa de rosario. 
 
 Pasos:
 
 * Fecha: ir a mano hasta el 2010. La flecha izquierda tiene que tocarse tantas veces como meses existan de diferencia entre el período base (1/1/2010) hasta la fecha. 
 
-* Materia prima: seleccionar trigo. 
+* Materia prima: todo. 
 
-* Bolsa: Rosario.
+* Bolsa: todo.
 
 * Moneda: Dolar. 
 
 * Click en buscar
 
-* Descargar la tabla completa. Ver si se puede hacer de una, y no necesariamente viendo las 75 páginas por selenium.
+* Descargar la tabla completa.
 
-* Hacer lo mismo con el maíz, soja, girasol, y sorgo. 
+Una vez extraídos los datos, tengo que hacer una media mensua para comparar la variación interanual. 
 
-Una vez extraídos los datos, tengo que hacer una media mensual. 
-
-# Scrap
+## Scrap
 
 ```{r configura, echo=T, message=FALSE, warning=FALSE, results='hide'}
 setwd("./instalacion selenium r") # Inserir caminho
@@ -157,7 +155,7 @@ export_csv_button$clickElement()
 Sys.sleep(5) 
 ```
 
-### Wrangling
+## Wrangling
 
 ```{r}
 serie <- read.csv("./series-historicas-pizarra.csv", sep = ";")
@@ -187,11 +185,9 @@ serie <- serie %>%
   )
 ```
 
-```{r}
-view(serie)
-```
 ### Outliers
-```{r}
+```{r echo = F, results = 'hide'}
+#Configuré para que no salga en el knit
 outliers_limits <- function(df){
   vector_de_precios <-df$Precio
   Q <- quantile(vector_de_precios, probs= c(.25, .75), na.rm = FALSE)
@@ -203,16 +199,16 @@ outliers_limits <- function(df){
 }
 
 ```
-```{r}
+```{r echo = F, results = 'hide'}
 outliers_limits(serie %>%
                   filter(Fecha > "01-01-2020"))
 ```
 
-```{r}
+```{r echo = F, results = 'hide'}
 outliers_limits(serie)
 ```
 
-```{r}
+```{r echo = T, results = 'hide'}
 # outliers <- serie %>%
 #   filter(Precio < outliers_limits(serie)[[2]])%>%
 #   summarise(
@@ -223,11 +219,24 @@ outliers_limits(serie)
 ```
 
 
-```{r}
+```{r fig.width=11, fig.height=8}
 ggplot(data = serie) + 
-  geom_boxplot(mapping = aes(x = Mercado, y = Precio)) + 
-  facet_wrap(~ Producto, nrow = 2)
+  geom_boxplot(mapping = aes(x = Mercado, y = Precio, fill = Mercado)) + 
+  facet_wrap(~ Producto, nrow = 2) +
+  theme_light()+
+  theme(legend.position="none")
+  
 ```
+
+El gráfico presentado revela información clave.
+
+* No hay datos completos para el Sorgo y para el Trigo art.12.
+
+* No todos los mercados presentan datos para todos los productos (o directamente no los comercializan). El de Rosario es el más importante. 
+
+* Los outliers son claros para marcar un límite superior, pero no tanto para el inferior. Se optó por tomar el rango de 45 a 1.000 dólares, descartando el resto. 
+
+
 ```{r}
 outliers <- serie %>%
   filter(Precio > 1000 | Precio < 45)
@@ -269,6 +278,8 @@ unlink("series-historicas-pizarra.csv")
 ```
 
 
+## Gráficos
 
+Facet grid de los precios de todos los productos para el mercado de rosario. 
 
 
