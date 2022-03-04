@@ -287,7 +287,26 @@ DT::datatable(serie_mensual,
 
 Facet grid de los precios de todos los productos para el mercado de rosario.
 
-```{r}
+```{r fig.width=11, fig.height=8}
+tabla_grafico <- full_join(
+  filter(serie_mensual, Mercado=='Rosario' && Producto == 'Soja'),
+  filter(serie_mensual, Mercado=='Rosario' && Producto == 'Trigo'),
+  by = "mes"
+  )%>%
+   full_join(filter(serie_mensual, Mercado=='Rosario' && Producto == 'Maiz'), by='mes')%>%
+   full_join(filter(serie_mensual, Mercado=='Rosario' && Producto == 'Girasol'), by ='mes')%>%
+   full_join(filter(serie_mensual, Mercado=='Rosario' && Producto == 'Sorgo'),by = 'mes') %>%
+  arrange(mes)
+
+
+plot_ly(tabla_grafico, x = ~tabla_grafico$mes, y = ~tabla_grafico$Precio_mensual.y, name = 'Trigo', type = 'scatter', mode = 'lines', connectgaps = T)%>% 
+  add_trace(y = ~tabla_grafico$Precio_mensual.x, name = 'Soja', mode = 'lines', connectgaps = T) %>%
+  add_trace(y = ~tabla_grafico$Precio_mensual.y.y, name = 'Girasol', mode = 'lines', connectgaps = T)%>%
+  add_trace(y = ~tabla_grafico$Precio_mensual.x.x, name = 'Maiz', mode = 'lines', connectgaps = T) %>%
+  add_trace(y = ~tabla_grafico$Precio_mensual, name = 'Sorgo', mode = 'lines', connectgaps = T)%>%
+  layout(title = "Precios de los principales granos. Mercado de Rosario.",
+         xaxis = list(title = "Fecha"),
+         yaxis = list (title = "U$D / ton. Precio de pizarra."))
 
 ```
 
