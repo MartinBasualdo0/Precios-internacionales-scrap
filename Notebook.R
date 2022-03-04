@@ -6,7 +6,7 @@ library(hrbrthemes)
 
 # formato fecha -----------------------------------------------------------
 
-serie$ï..Fecha %>%
+serie$?..Fecha %>%
   as.Date(format = "%d-%m-%y")
 
 # eliminar outliers -------------------------------------------------------
@@ -47,9 +47,9 @@ serie_mask
 serie_mask %>%
   mutate(
    mes = month(Fecha),
-   año = year(Fecha)
+   a?o = year(Fecha)
   ) %>%
-  group_by(Mercado, Producto, año, mes) %>%
+  group_by(Mercado, Producto, a?o, mes) %>%
   summarise(Precio_mensual = mean(Precio))
 
 
@@ -58,10 +58,50 @@ serie_mask %>%
 
 view(serie_mensual %>%
   group_by(Mercado, Producto) %>%
-  # arrange(mes, año) %>%
+  # arrange(mes, a?o) %>%
   mutate(
     var_ia = (Precio_mensual - lag(Precio_mensual, 12)) / lag(Precio_mensual, 12)
   ))
 
 view(serie_mensual %>%
-       arrange(año, mes))
+       arrange(a?o, mes))
+
+
+# Graficos linea ----------------------------------------------------------
+
+serie_rosario <- filter(serie_mensual, Mercado == 'Rosario')
+
+soja_graf <- serie_rosario%>%
+  filter(Mercado == 'Rosario' && Producto == 'Soja')
+
+trigo_graf <- serie_rosario%>%
+  filter(Mercado == 'Rosario' && Producto == 'Trigo')
+
+
+girasol_graf <- serie_rosario%>%
+  filter(Mercado == 'Rosario' && Producto == 'Girasol')
+
+(girasol_graf)
+
+
+
+
+plot_ly(serie_mensual, x = ~serie_mensual$mes, y = ~trigo_graf$Precio_mensual, name = 'Trigo', type = 'scatter', mode = 'lines')
+
+
+view(merge(soja_graf,girasol_graf,all=TRUE, by = soja_graf$mes))
+
+view(
+  full_join(
+    filter(serie_mensual, Mercado=='Rosario' && Producto == 'Soja'),
+    filter(serie_mensual, Mercado=='Rosario' && Producto == 'Trigo'),
+    by = "mes"
+    )%>%
+     full_join(filter(serie_mensual, Mercado=='Rosario' && Producto == 'Maiz'), by='mes')%>%
+     full_join(filter(serie_mensual, Mercado=='Rosario' && Producto == 'Girasol'), by ='mes')%>%
+     full_join(filter(serie_mensual, Mercado=='Rosario' && Producto == 'Sorgo'),by = 'mes')
+  )
+
+plot_ly(serie_rosario, x = ~serie_mensual$mes, y = ~trigo_graf$Precio_mensual, name = 'Trigo', type = 'scatter', mode = 'lines')%>% 
+  add_trace(y = ~soja_graf$Precio_mensual, name = 'Soja', mode = 'lines') %>%
+  add_trace(y = ~girasol_graf$Precio_mensual, name = 'Girasol', mode = 'lines')

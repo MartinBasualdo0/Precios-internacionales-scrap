@@ -39,6 +39,7 @@ library(rvest)
 library(glue)
 library(dplyr) #Para calcular la variación mensual
 library(jsonlite)
+library(plotly)
 ```
 ```{r abrir_navegador, echo = T, results = 'hide'}
 link = "https://news.agrofy.com.ar/granos/series-historicas-pizarra"
@@ -135,7 +136,7 @@ moneda_option <- driver$findElements(using = 'css',
                                    value = '.option')
 moneda_option[[2]]$clickElement()
 ```
-Buscamos la wea
+Buscamos.
 
 ```{r}
 down <- driver$findElement("css", "body")
@@ -250,12 +251,12 @@ serie_mask <- serie %>%
 ### Media mensual
 
 ```{r}
+serie_mask$mes <- floor_date(serie_mask$Fecha, "month")
+```
+
+```{r}
 serie_mensual <- serie_mask %>%
-  mutate(
-   mes = month(Fecha),
-   año = year(Fecha)
-  ) %>%
-  group_by(Mercado, Producto, año, mes) %>%
+  group_by(Mercado, Producto, mes) %>%
   summarise(Precio_mensual = mean(Precio))
 ```
 ### Variación interanual de la media mensual
@@ -270,6 +271,28 @@ serie_mensual <- serie_mensual %>%
 
 Por cuestiones de números de datos, se recomienda descartar el "Trigo art. 12", y todos los mercados, excepto el de rosario.  
 
+
+## Presentamos los datos sin los outliers   
+```{r}
+DT::datatable(serie_mensual,
+              class = 'cell-border stripe',
+              extensions = 'Buttons',
+              options = list(
+                dom = 'Bfrtip',
+                buttons = c('copy', 'csv', 'excel', 'pdf', 'print')
+                ))
+```
+
+## Gráficos
+
+Facet grid de los precios de todos los productos para el mercado de rosario.
+
+```{r}
+
+```
+
+
+
 ## Exportar Json
 
 ```{r}
@@ -278,8 +301,5 @@ unlink("series-historicas-pizarra.csv")
 ```
 
 
-## Gráficos
-
-Facet grid de los precios de todos los productos para el mercado de rosario. 
 
 
