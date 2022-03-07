@@ -231,7 +231,7 @@ ggplot(data = serie) +
 
 El gráfico presentado revela información clave.
 
-* No hay datos completos para el Sorgo y para el Trigo art.12.
+* No hay datos completos para el Trigo art.12.
 
 * No todos los mercados presentan datos para todos los productos (o directamente no los comercializan). El de Rosario es el más importante. 
 
@@ -287,7 +287,7 @@ DT::datatable(serie_mensual,
 
 Facet grid de los precios de todos los productos para el mercado de rosario.
 
-```{r fig.width=11, fig.height=8}
+```{r fig.width=9, fig.height=6}
 tabla_grafico <- full_join(
   filter(serie_mensual, Mercado=='Rosario' && Producto == 'Soja'),
   filter(serie_mensual, Mercado=='Rosario' && Producto == 'Trigo'),
