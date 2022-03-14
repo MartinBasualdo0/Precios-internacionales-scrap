@@ -247,7 +247,14 @@ outliers
 serie_mask <- serie %>%
   filter(between(Precio, 45, 1000))
 ```
-
+```{r fig.width=11, fig.height=8}
+ggplot(data = serie_mask) + 
+  geom_boxplot(mapping = aes(x = Mercado, y = Precio, fill = Mercado)) + 
+  facet_wrap(~ Producto, nrow = 2) +
+  theme_light()+
+  theme(legend.position="none")
+  
+```
 ### Media mensual
 
 ```{r}
