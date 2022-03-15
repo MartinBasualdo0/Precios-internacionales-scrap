@@ -4,25 +4,26 @@ author: "INDEC"
 date: "2/3/2022"
 output: html_document
 ---
+
 ## Idea
 
-Entrar a [Agrofy](https://news.agrofy.com.ar/granos/series-historicas-pizarra), donde se encuentran los precios pizarra (diferente al oficial, CBOT y MtR) de los principales granos a valor FOB en los principales puertos. El más representativo es el de la bolsa de rosario. 
+Entrar a [Agrofy](https://news.agrofy.com.ar/granos/series-historicas-pizarra), donde se encuentran los precios pizarra (diferente al oficial, CBOT y MtR) de los principales granos a valor FOB en los principales puertos. El más representativo es el de la bolsa de rosario.
 
 Pasos:
 
-* Fecha: ir a mano hasta el 2010. La flecha izquierda tiene que tocarse tantas veces como meses existan de diferencia entre el período base (1/1/2010) hasta la fecha. 
+-   Fecha: ir a mano hasta el 2010. La flecha izquierda tiene que tocarse tantas veces como meses existan de diferencia entre el período base (1/1/2010) hasta la fecha.
 
-* Materia prima: todo. 
+-   Materia prima: todo.
 
-* Bolsa: todo.
+-   Bolsa: todo.
 
-* Moneda: Dolar. 
+-   Moneda: Dolar.
 
-* Click en buscar
+-   Click en buscar
 
-* Descargar la tabla completa.
+-   Descargar la tabla completa.
 
-Una vez extraídos los datos, tengo que hacer una media mensua para comparar la variación interanual. 
+Una vez extraídos los datos, tengo que hacer una media mensual para comparar la variación interanual.
 
 ## Scrap
 
@@ -31,6 +32,7 @@ setwd("./instalacion selenium r") # Inserir caminho
 system("java -jar selenium-server-standalone-4.0.0-alpha-1.jar", wait = FALSE) # Declara selenium
 system("chromedriver.exe", wait = FALSE) # Declara chromedriver
 ```
+
 ```{r librerías, echo=T, message=FALSE, warning=FALSE, results='hide'}
 library(RSelenium)
 library(tidyverse)
@@ -41,6 +43,7 @@ library(dplyr) #Para calcular la variación mensual
 library(jsonlite)
 library(plotly)
 ```
+
 ```{r abrir_navegador, echo = T, results = 'hide'}
 link = "https://news.agrofy.com.ar/granos/series-historicas-pizarra"
 
@@ -64,11 +67,10 @@ driver$navigate(link) # Navega pelo link
 driver$maxWindowSize() # Maximiza a janela do navegador
 ```
 
-
-Se cierra solo en 6 segundos aprox. 
-
+Se cierra solo en 6 segundos aprox.
 
 Abrimos el calendario para elegir el inicio del periodo a consultar
+
 ```{r}
 Sys.sleep(10)
 
@@ -80,6 +82,7 @@ to_date_picker<- date_pickers[[2]]
 
 since_date_picker$clickElement() #abre datepicker que selecciona inicio de consulta
 ```
+
 Ahora tenemos que crear una funcion que, dada una fecha, la elija en el datepicker
 
 ```{r}
@@ -104,12 +107,12 @@ auto_datepicker <- function(desde){
 }
 ```
 
-
-
 ```{r}
 auto_datepicker('2010-01-01')
 ```
+
 ### Producto, mercado, moneda
+
 ```{r}
 producto_mercado_dropdown <- driver$findElements(using = 'css',
                                    value = '.dropdown-heading-value')
@@ -136,6 +139,7 @@ moneda_option <- driver$findElements(using = 'css',
                                    value = '.option')
 moneda_option[[2]]$clickElement()
 ```
+
 Buscamos.
 
 ```{r}
@@ -147,7 +151,6 @@ buscar <- driver$findElements(using = 'css',
 buscar[[length(buscar)]]$clickElement()
 Sys.sleep(60) #55 en realiad, pero prefiero darle paso
 ```
-
 
 ```{r}
 export_csv_button <- driver$findElement(using = 'css',
@@ -162,6 +165,7 @@ Sys.sleep(5)
 serie <- read.csv("./series-historicas-pizarra.csv", sep = ";")
 view(serie)
 ```
+
 ```{r}
 
 #Limpiamos los datos
@@ -176,7 +180,6 @@ serie <- rename(serie, Fecha = ï..Fecha)
 
 ```
 
-
 ```{r}
 #Creamos una variable para ver los 
 serie <- serie %>%
@@ -187,6 +190,7 @@ serie <- serie %>%
 ```
 
 ### Outliers
+
 ```{r echo = F, results = 'hide'}
 #Configuré para que no salga en el knit
 outliers_limits <- function(df){
@@ -200,6 +204,7 @@ outliers_limits <- function(df){
 }
 
 ```
+
 ```{r echo = F, results = 'hide'}
 outliers_limits(serie %>%
                   filter(Fecha > "01-01-2020"))
@@ -219,7 +224,6 @@ outliers_limits(serie)
 # outliers
 ```
 
-
 ```{r fig.width=11, fig.height=8}
 ggplot(data = serie) + 
   geom_boxplot(mapping = aes(x = Mercado, y = Precio, fill = Mercado)) + 
@@ -231,22 +235,23 @@ ggplot(data = serie) +
 
 El gráfico presentado revela información clave.
 
-* No hay datos completos para el Trigo art.12.
+-   No hay datos completos para el Trigo art.12.
 
-* No todos los mercados presentan datos para todos los productos (o directamente no los comercializan). El de Rosario es el más importante. 
+-   No todos los mercados presentan datos para todos los productos (o directamente no los comercializan). El de Rosario es el más importante.
 
-* Los outliers son claros para marcar un límite superior, pero no tanto para el inferior. Se optó por tomar el rango de 45 a 1.000 dólares, descartando el resto. 
-
+-   Los outliers son claros para marcar un límite superior, pero no tanto para el inferior. Se optó por tomar el rango de 45 a 1.000 dólares, descartando el resto.
 
 ```{r}
 outliers <- serie %>%
   filter(Precio > 1000 | Precio < 45)
 outliers
 ```
+
 ```{r}
 serie_mask <- serie %>%
   filter(between(Precio, 45, 1000))
 ```
+
 ```{r fig.width=11, fig.height=8}
 ggplot(data = serie_mask) + 
   geom_boxplot(mapping = aes(x = Mercado, y = Precio, fill = Mercado)) + 
@@ -255,6 +260,7 @@ ggplot(data = serie_mask) +
   theme(legend.position="none")
   
 ```
+
 ### Media mensual
 
 ```{r}
@@ -266,6 +272,7 @@ serie_mensual <- serie_mask %>%
   group_by(Mercado, Producto, mes) %>%
   summarise(Precio_mensual = mean(Precio))
 ```
+
 ### Variación interanual de la media mensual
 
 ```{r}
@@ -276,10 +283,10 @@ serie_mensual <- serie_mensual %>%
 
 ```
 
-Por cuestiones de números de datos, se recomienda descartar el "Trigo art. 12", y todos los mercados, excepto el de rosario.  
+Por cuestiones de números de datos, se recomienda descartar el "Trigo art. 12", y todos los mercados, excepto el de rosario.
 
+## Presentamos los datos sin los outliers
 
-## Presentamos los datos sin los outliers   
 ```{r}
 DT::datatable(serie_mensual,
               class = 'cell-border stripe',
@@ -317,15 +324,9 @@ plot_ly(tabla_grafico, x = ~tabla_grafico$mes, y = ~tabla_grafico$Precio_mensual
 
 ```
 
-
-
 ## Exportar Json
 
 ```{r}
 write_json(serie_mensual, "./agrofy10años.json")
 unlink("series-historicas-pizarra.csv")
 ```
-
-
-
-
