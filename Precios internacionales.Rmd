@@ -214,15 +214,6 @@ outliers_limits(serie %>%
 outliers_limits(serie)
 ```
 
-```{r echo = T, results = 'hide'}
-# outliers <- serie %>%
-#   filter(Precio < outliers_limits(serie)[[2]])%>%
-#   summarise(
-#     count = n()
-#   )
-# 
-# outliers
-```
 
 ```{r fig.width=11, fig.height=8}
 ggplot(data = serie) + 
