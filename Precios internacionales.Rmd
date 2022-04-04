@@ -146,6 +146,7 @@ Buscamos.
 down <- driver$findElement("css", "body")
 down$sendKeysToElement(list(key = "down_arrow"))
 down$sendKeysToElement(list(key = "down_arrow"))
+Sys.sleep(2)
 buscar <- driver$findElements(using = 'css',
                                    value = '.btn-primary')
 buscar[[length(buscar)]]$clickElement()
