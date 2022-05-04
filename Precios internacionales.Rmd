@@ -29,7 +29,7 @@ Una vez extraídos los datos, tengo que hacer una media mensual para comparar la
 
 ```{r configura, echo=T, message=FALSE, warning=FALSE, results='hide'}
 setwd("./instalacion selenium r") # Inserir caminho
-system("java -jar selenium-server-standalone-4.0.0-alpha-1.jar", wait = FALSE) # Declara selenium
+system("java -jar selenium-server-4.1.4.jar", wait = FALSE) # Declara selenium
 system("chromedriver.exe", wait = FALSE) # Declara chromedriver
 ```
 
